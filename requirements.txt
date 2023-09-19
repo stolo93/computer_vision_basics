@@ -1,2 +1,4 @@
-opencv-python
-mediapipe
+opencv-python~=4.8.0.76
+mediapipe~=0.10.5
+pycaw~=20230407
+numpy~=1.25.2
