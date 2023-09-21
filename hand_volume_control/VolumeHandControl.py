@@ -2,9 +2,9 @@ import cv2
 import time
 from math import hypot
 
-from cv_tracking import HandTrackingModule as htm
+from HandTrackingModule import HandDetector
 from Utils.VideoCaptureDevice import VideoCaptureDevice
-from Utils.VolumeControl import set_master_volume
+from VolumeControl import set_master_volume
 
 
 def translate(value, leftMin, leftMax, rightMin, rightMax):
@@ -28,7 +28,7 @@ FINGER_TIPS = {
 current_time = 0
 previous_time = 0
 
-detector = htm.HandDetector(min_detection_confidence=0.8)
+detector = HandDetector(min_detection_confidence=0.8)
 
 with VideoCaptureDevice(0) as cap:
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_HEIGHT)
