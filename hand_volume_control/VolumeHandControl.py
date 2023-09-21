@@ -1,12 +1,10 @@
 import cv2
 import time
 from math import hypot
-
-from VolumeControl import set_master_volume
-from HandTrackingModule import HandDetector
-
 import sys
-sys.path.append('..')
+
+from Utils.VolumeControl import set_master_volume
+from HandTracking.HandDetector import HandDetector
 from Utils.VideoCaptureDevice import VideoCaptureDevice
 
 
@@ -25,27 +23,26 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
 def main():
     show_cam: bool = True if len(sys.argv) > 1 and sys.argv[1] == '--cam' else False
 
-    CAM_HEIGHT, CAM_WIDTH = 640, 460
-    FINGER_TIPS = {
+    cam_height, cam_width = 640, 460
+    finger_tips = {
         'thumb': 4,
         'index': 8
     }
 
-    current_time = 0
     previous_time = 0
 
     detector = HandDetector(min_detection_confidence=0.8)
 
     with VideoCaptureDevice(0) as cap:
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_HEIGHT)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_WIDTH)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, cam_height)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_width)
         while True:
             success, img = cap.read()
             landmarks = detector.find_position(img, draw=False)
 
             if len(landmarks) != 0:
-                thumb_tip = landmarks[FINGER_TIPS['thumb']]
-                index_finger_tip = landmarks[FINGER_TIPS['index']]
+                thumb_tip = landmarks[finger_tips['thumb']]
+                index_finger_tip = landmarks[finger_tips['index']]
 
                 x1, y1 = thumb_tip[1], thumb_tip[2]
                 x2, y2 = index_finger_tip[1], index_finger_tip[2]
