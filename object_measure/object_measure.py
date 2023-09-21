@@ -4,6 +4,8 @@ import imutils
 import numpy as np
 from imutils import contours
 from imutils import perspective
+from math import dist
+
 
 def midpoint(pt_a: tuple, pt_b: tuple):
     return int((pt_a[0] + pt_b[0]) * 0.5), int((pt_a[1] + pt_b[1]) * 0.5)
@@ -15,11 +17,19 @@ def main():
         description='Measure objects in the image provided\nmeasure is calibrated by the leftmost object in the image'
     )
     parser.add_argument('-i', '--image', required=True)  # Image path
-    parser.add_argument('-s', '--size', required=True)  # Size of the reference 'leftmost' object
+    parser.add_argument('-w', '--width', required=True)  # Width of the reference 'leftmost' object
 
     args = parser.parse_args()
+    try:
+        referal_width = float(args.width)
+    except ValueError as e:
+        print(e)
+        exit(1)
+
     image = cv2.imread(args.image)
-    desired_max_width = 500
+    assert image is not None, f'Invalid image path {args.image}'
+
+    desired_max_width = 1200
 
     # Resize the image if needed
     if image.shape[1] > desired_max_width:
@@ -80,9 +90,22 @@ def main():
         cv2.line(orig, (tltr_x, tltr_y), (blbr_x, blbr_y), (255, 0, 255), 1)
         cv2.line(orig, (tlbl_x, tlbl_y), (trbr_x, trbr_y), (255, 0, 255), 1)
 
+        # Compute size in pixels
+        distance_a = dist((tlbl_x, tlbl_y), (trbr_x, trbr_y))
+        distance_b = dist((tltr_x, tltr_y), (blbr_x, blbr_y))
+
+        # Compute pixels per metric ration based on the dimension provided
+        if pixels_per_metric is None:
+            pixels_per_metric = referal_width / distance_a
+
+        width = distance_a * pixels_per_metric
+        height = distance_b * pixels_per_metric
+
+        cv2.putText(orig, f'{height:.2f}', (tltr_x - 10, tltr_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 1)
+        cv2.putText(orig, f'{width:.2f}', (tlbl_x + 10, tlbl_y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 1)
 
     cv2.imshow('Frame', orig)
-    cv2.waitKey(10000)
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
