@@ -45,17 +45,13 @@ def main():
     edged = cv2.dilate(edged, None, iterations=1)
     edged = cv2.erode(edged, None, iterations=1)
 
-    cv2.imshow('edged picture', edged)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
     cnts = cv2.findContours(edged, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     cnts, _ = contours.sort_contours(cnts)  # Sort contours from left to right
 
     pixels_per_metric = None
     for c in cnts:
-        # If contour area is not big enough ingore it
+        # If contour area is not big enough ignore it
         if cv2.contourArea(c) < 100:
             continue
 
